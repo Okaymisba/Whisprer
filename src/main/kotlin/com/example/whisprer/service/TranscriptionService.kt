@@ -37,7 +37,7 @@ class TranscriptionService {
 
     private val apiKey = Env.getOrThrow("WHISPRER_API_KEY")
     private val supabaseUrl = Env.getOrThrow("SUPABASE_URL")
-    private val supabaseAnonKey = Env.get("SUPABASE_ANON_KEY", "")
+    private val supabaseAnonKey = Env.getOrThrow("SUPABASE_ANON_KEY")
 
     suspend fun transcribeAudio(audioFile: File): Result<String> {
         return try {
