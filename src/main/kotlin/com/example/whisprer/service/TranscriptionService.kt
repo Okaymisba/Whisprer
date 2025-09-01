@@ -14,15 +14,8 @@ import java.io.File
 import java.util.*
 
 @Serializable
-data class TranscribeRequest(
-    val audioBase64: String,
-    val audioFormat: String = "webm"
-)
-
-@Serializable
 data class TranscribeResponse(
-    val transcript: String,
-    val remaining_credits: Int
+    val transcript: String, val remainingCredits: Int
 )
 
 class TranscriptionService {
@@ -37,7 +30,7 @@ class TranscriptionService {
 
     private val apiKey = Env.getOrThrow("WHISPRER_API_KEY")
     private val supabaseUrl = Env.getOrThrow("SUPABASE_URL")
-    private val supabaseAnonKey = Env.get("SUPABASE_ANON_KEY", "")
+    private val supabaseAnonKey = Env.getOrThrow("SUPABASE_ANON_KEY")
 
     suspend fun transcribeAudio(audioFile: File): Result<String> {
         return try {

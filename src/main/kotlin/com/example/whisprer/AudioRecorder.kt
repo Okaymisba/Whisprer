@@ -12,8 +12,7 @@ class AudioRecorder {
 
     // Audio format configuration - using CD quality
     private val audioFormat = AudioFormat(
-        AudioFormat.Encoding.PCM_SIGNED,
-        44100f,      // Sample rate (CD quality)
+        AudioFormat.Encoding.PCM_SIGNED, 44100f,      // Sample rate (CD quality)
         16,          // Sample size in bits (16-bit for CD quality)
         2,           // Channels (2 for stereo)
         4,           // Frame size (2 bytes/sample * 2 channels)
@@ -88,9 +87,7 @@ class AudioRecorder {
 
             // Save as WAV file
             val audioInputStream = AudioInputStream(
-                ByteArrayInputStream(audioData),
-                audioFormat,
-                audioData.size.toLong() / audioFormat.frameSize
+                ByteArrayInputStream(audioData), audioFormat, audioData.size.toLong() / audioFormat.frameSize
             )
 
             AudioSystem.write(audioInputStream, AudioFileFormat.Type.WAVE, outputFile)
@@ -104,19 +101,19 @@ class AudioRecorder {
         }
     }
 
-    private fun playAudio(audioFile: File) {
-        try {
-            val audioIn = AudioSystem.getAudioInputStream(audioFile)
-            val clip = AudioSystem.getClip()
-            clip.open(audioIn)
-            clip.start()
-
-            // Keep the application running while the clip is playing
-            Thread.sleep(clip.microsecondLength / 1000)
-            clip.close()
-            audioIn.close()
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-    }
+//    private fun playAudio(audioFile: File) {
+//        try {
+//            val audioIn = AudioSystem.getAudioInputStream(audioFile)
+//            val clip = AudioSystem.getClip()
+//            clip.open(audioIn)
+//            clip.start()
+//
+//            // Keep the application running while the clip is playing
+//            Thread.sleep(clip.microsecondLength / 1000)
+//            clip.close()
+//            audioIn.close()
+//        } catch (e: Exception) {
+//            e.printStackTrace()
+//        }
+//    }
 }
