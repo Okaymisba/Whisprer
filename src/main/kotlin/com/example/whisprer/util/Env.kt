@@ -16,6 +16,6 @@ object Env {
 
     fun getOrThrow(key: String): String {
         return dotenv[key] ?: System.getenv(key)
-            ?: throw IllegalStateException("Missing required environment variable: $key")
+        ?: throw IllegalStateException("Missing required environment variable: $key")
     }
 }

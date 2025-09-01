@@ -14,15 +14,8 @@ import java.io.File
 import java.util.*
 
 @Serializable
-data class TranscribeRequest(
-    val audioBase64: String,
-    val audioFormat: String = "webm"
-)
-
-@Serializable
 data class TranscribeResponse(
-    val transcript: String,
-    val remaining_credits: Int
+    val transcript: String, val remainingCredits: Int
 )
 
 class TranscriptionService {
