@@ -13,11 +13,28 @@ import kotlinx.serialization.json.Json
 import java.io.File
 import java.util.*
 
+/**
+ * Represents the response object for a transcription request.
+ *
+ * @property transcript The transcribed text as a string result from the transcription API.
+ * @property remainingCredits The number of remaining transcription credits available for the user.
+ */
 @Serializable
 data class TranscribeResponse(
     val transcript: String, val remainingCredits: Int
 )
 
+/**
+ * A service class responsible for handling voice-to-text transcription of audio files by interacting
+ * with an external transcription API. This service reads audio files, encodes them in Base64, and
+ * sends them for processing to the defined API endpoint.
+ *
+ * The class requires an API key to authenticate requests. The API key is retrieved from the environment
+ * configuration or gracefully handled if not set.
+ *
+ * It handles errors, unexpected responses, and file cleanup post-transcription. The transcription
+ * response is parsed, cleaned, and returned as a formatted text result.
+ */
 class TranscriptionService {
     private val client = HttpClient(CIO) {
         install(ContentNegotiation) {
@@ -38,6 +55,12 @@ class TranscriptionService {
 
     fun isApiKeySet(): Boolean = apiKey != null
 
+    /**
+     * Transcribes the audio content from the provided audio file into text.
+     *
+     * @param audioFile The audio file to be transcribed. Must be a valid file with readable content.
+     * @return A [Result] instance containing the transcribed text if successful, or an error if the transcription fails.
+     */
     suspend fun transcribeAudio(audioFile: File): Result<String> {
         if (!isApiKeySet()) {
             return Result.failure(IllegalStateException("API key is not set. Please set it in the settings."))
