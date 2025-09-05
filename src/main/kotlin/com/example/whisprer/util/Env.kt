@@ -1,21 +1,17 @@
 package com.example.whisprer.util
 
-import io.github.cdimascio.dotenv.dotenv
+import java.util.prefs.Preferences
 
 object Env {
-    private val dotenv = dotenv {
-        directory = "./"
-        ignoreIfMissing = true
-    }
-
-    fun get(key: String, default: String = ""): String {
-        return dotenv[key, default].ifEmpty {
-            System.getenv(key) ?: default
-        }
-    }
+    private val prefs: Preferences = Preferences.userNodeForPackage(Env::class.java)
 
     fun getOrThrow(key: String): String {
-        return dotenv[key] ?: System.getenv(key)
-        ?: throw IllegalStateException("Missing required environment variable: $key")
+        return prefs.get(key, null)
+            ?: throw IllegalStateException("Environment variable $key is not set. Please set it using Env.set()")
+    }
+
+    fun set(key: String, value: String) {
+        prefs.put(key, value)
+        prefs.flush() // Ensure the preferences are written to disk immediately
     }
 }

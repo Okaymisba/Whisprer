@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.example.whisprer.SettingsController"
+      spacing="20" style="-fx-padding: 20;">
+    <Label text="Settings" style="-fx-font-size: 20px; -fx-font-weight: bold;" />
+    <Label text="Whisprer API Key:" />
+    <TextField fx:id="apiKeyField" promptText="Enter Whisprer API Key" />
+    <Button text="Save" onAction="#saveApiKey" style="-fx-background-color: #3498db; -fx-text-fill: white;"/>
+</VBox>

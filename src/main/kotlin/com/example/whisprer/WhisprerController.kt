@@ -3,12 +3,17 @@ package com.example.whisprer
 import com.example.whisprer.service.TranscriptionService
 import javafx.application.Platform
 import javafx.fxml.FXML
+import javafx.fxml.FXMLLoader
+import javafx.scene.Parent
+import javafx.scene.Scene
 import javafx.scene.control.Alert
 import javafx.scene.control.Button
 import javafx.scene.control.Label
 import javafx.scene.control.TextArea
 import javafx.scene.layout.VBox
 import javafx.scene.text.Text
+import javafx.stage.Modality
+import javafx.stage.Stage
 import kotlinx.coroutines.*
 import java.awt.Toolkit
 import java.awt.datatransfer.StringSelection
@@ -134,4 +139,23 @@ class WhisprerController {
     fun onClose() {
         coroutineScope.cancel()
     }
+
+    @FXML
+    fun openSettingsWindow() {
+        try {
+            // Load the settings view FXML file
+            val fxmlLoader = FXMLLoader(javaClass.getResource("/com/example/whisprer/settings-view.fxml"))
+            val root: Parent = fxmlLoader.load()
+
+            // Set up a new stage for the settings window
+            val stage = Stage()
+            stage.title = "Settings"
+            stage.scene = Scene(root, 300.0, 200.0)
+            stage.initModality(Modality.APPLICATION_MODAL) // Makes the window modal
+            stage.showAndWait()
+        } catch (e: Exception) {
+            e.printStackTrace() // Debugging error handling
+        }
+    }
+
 }
