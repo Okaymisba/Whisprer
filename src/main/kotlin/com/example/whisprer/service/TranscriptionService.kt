@@ -63,6 +63,14 @@ class TranscriptionService {
             }
         } catch (e: Exception) {
             Result.failure(Exception("Error during transcription: ${e.message}"))
+        } finally {
+            try {
+                if (audioFile.exists()) {
+                    audioFile.delete()
+                }
+            } catch (e: Exception) {
+                println("Failed to delete audio file: ${e.message}")
+            }
         }
     }
 }
