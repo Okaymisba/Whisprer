@@ -48,7 +48,7 @@ class WhisprerController {
 
     private var isRecording = false
     private val audioRecorder = AudioRecorder()
-    private val transcriptionService = TranscriptionService()
+    private val transcriptionService by lazy { TranscriptionService() }
     private val coroutineScope = CoroutineScope(Dispatchers.Main + Job())
 
     @FXML
