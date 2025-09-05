@@ -15,8 +15,7 @@ import java.util.*
 
 @Serializable
 data class TranscribeResponse(
-    val transcript: String,
-    val remainingCredits: Int
+    val transcript: String, val remainingCredits: Int
 )
 
 class TranscriptionService {
@@ -25,7 +24,7 @@ class TranscriptionService {
             json(Json { ignoreUnknownKeys = true })
         }
         engine {
-            requestTimeout = 60_000 // 60 seconds timeout
+            requestTimeout = 60_000
         }
     }
 
@@ -64,15 +63,11 @@ class TranscriptionService {
             }
 
             val responseBody = response.bodyAsText()
-            println("Raw API Response: $responseBody")  // Debug log
+            println("Raw API Response: $responseBody")
 
             if (response.status.isSuccess()) {
                 val result = Json.decodeFromString<TranscribeResponse>(responseBody)
-                // Clean up the transcript by removing duplicate words
-                val cleanedTranscript = result.transcript.split(", ")
-                    .map { it.trim() }
-                    .distinct()
-                    .joinToString(" ")
+                val cleanedTranscript = result.transcript.split(", ").map { it.trim() }.distinct().joinToString(" ")
                 Result.success(cleanedTranscript)
             } else {
                 Result.failure(Exception("Transcription failed: $responseBody"))
