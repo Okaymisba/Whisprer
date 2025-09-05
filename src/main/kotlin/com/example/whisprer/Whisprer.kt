@@ -6,6 +6,17 @@ import javafx.scene.Parent
 import javafx.scene.Scene
 import javafx.stage.Stage
 
+/**
+ *
+ * Main application class for the Whisprer application, which provides functionality
+ * for voice-to-text transcription. This class sets up the primary stage and initializes
+ * the application's UI using an FXML file.
+ *
+ * The application includes features for recording voice input, transcribing the audio,
+ * and interacting with the user through a graphical interface.
+ *
+ * Inherits from the `Application` class to support the JavaFX application lifecycle.
+ */
 class Whisprer : Application() {
     override fun start(primaryStage: Stage) {
         // Load the FXML file
@@ -27,6 +38,13 @@ class Whisprer : Application() {
         primaryStage.show()
     }
 
+    /**
+     * Companion object providing the entry point for the Whisprer application.
+     *
+     * The `main` method serves as the starting point for launching the JavaFX application.
+     * It initializes and invokes the application lifecycle by calling the `launch` method
+     * with the `Whisprer` class reference and any supplied runtime arguments.
+     */
     companion object {
         @JvmStatic
         fun main(args: Array<String>) {
