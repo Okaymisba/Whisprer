@@ -3,6 +3,7 @@ plugins {
     application
     id("org.openjfx.javafxplugin") version "0.0.13"
     kotlin("plugin.serialization") version "1.9.0"
+    id("com.github.johnrengelman.shadow") version "8.1.1"
 }
 
 group = "com.example"
@@ -21,7 +22,7 @@ tasks.withType<JavaCompile> {
 
 application {
     mainModule.set("com.example.whisprer")
-    mainClass.set("com.example.whisprer.WhisprerKt")
+    mainClass.set("com.example.whisprer.LauncherKt")
 }
 
 java {
@@ -97,4 +98,24 @@ tasks.named<JavaExec>("run") {
     jvmArgs = listOf(
         "--add-exports=javafx.graphics/com.sun.javafx.application=ALL-UNNAMED"
     )
+}
+
+tasks {
+    shadowJar {
+        archiveBaseName.set("Whisprer")
+        archiveClassifier.set("")
+        archiveVersion.set("1.0")
+        manifest {
+            attributes(
+                "Main-Class" to "com.example.whisprer.LauncherKt",
+                "Implementation-Title" to "Whisprer",
+                "Implementation-Version" to project.version
+            )
+        }
+        mergeServiceFiles()
+    }
+
+    build {
+        dependsOn(shadowJar)
+    }
 }
