@@ -1,0 +1,7 @@
+// jpackage configuration for application packaging
+
+jpackage --input build/libs \
+         --main-jar Whisprer-1.0.jar \
+         --main-class com.example.whisprer.LauncherKt \
+         --name Whisprer \
+         --type app-image
