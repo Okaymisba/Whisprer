@@ -18,10 +18,15 @@ jobs:
         java-version: '17'
         distribution: 'temurin'
 
-    - name: Set up WiX Toolset
-      uses: wix/setup-wix@v1
-      with:
-        version: '3.11.2'
+    - name: Install WiX Toolset via Chocolatey
+      shell: pwsh
+      run: |
+        Set-ExecutionPolicy Bypass -Scope Process -Force
+        [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072
+        iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
+        choco install wixtoolset -y --no-progress
+        $env:PATH = "C:\Program Files (x86)\WiX Toolset v3.11\bin;$env:PATH"
+        echo "C:\Program Files (x86)\WiX Toolset v3.11\bin" | Out-File -FilePath $env:GITHUB_PATH -Append
 
     - name: Grant gradlew execute permission
       shell: bash
