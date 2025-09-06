@@ -47,7 +47,7 @@ dependencies {
     implementation("org.openjfx:javafx-controls:17.0.7")
     implementation("org.openjfx:javafx-fxml:17.0.7")
 
-    // Global hotkey support
+    // Global keyboard and mouse event handling - Updated to the latest version
     implementation("com.github.kwhat:jnativehook:2.2.2")
 
     // Ktor for HTTP requests
