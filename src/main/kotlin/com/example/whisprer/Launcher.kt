@@ -1,49 +1,50 @@
 package com.example.whisprer
 
+import com.example.whisprer.service.TranscriptionService
 import com.github.kwhat.jnativehook.GlobalScreen
 import com.github.kwhat.jnativehook.NativeHookException
 import com.github.kwhat.jnativehook.keyboard.NativeKeyEvent
 import com.github.kwhat.jnativehook.keyboard.NativeKeyListener
 import javafx.application.Application
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import java.awt.Toolkit
 import java.awt.datatransfer.StringSelection
+import java.io.File
 import java.util.logging.Level
 import java.util.logging.Logger
 
 fun main() {
-    // Configure JNativeHook logging
     val logger = Logger.getLogger(GlobalScreen::class.java.`package`.name)
     logger.level = Level.WARNING
 
-    // Remove default console handler to prevent unwanted output
     logger.useParentHandlers = false
 
-    // Start the JavaFX application in a separate thread
     Thread {
         Application.launch(Whisprer::class.java)
     }.start()
 
-    // Setup the global shortcut listener in the main thread
     setupGlobalShortcut()
 }
 
-// Function to set up global key listener for recording shortcut
+private val transcriptionService = TranscriptionService()
+private val audioRecorder = AudioRecorder()
+private var audioFile: File? = null
+
 fun setupGlobalShortcut() {
     try {
-        // Set up the global screen
         GlobalScreen.registerNativeHook()
 
-        // Create the key listener
         val keyListener = object : NativeKeyListener {
             private var isRecording = false
 
             override fun nativeKeyPressed(event: NativeKeyEvent) {
-                // Check for Ctrl + Alt + Shift + P
                 if ((event.modifiers and (NativeKeyEvent.CTRL_MASK or NativeKeyEvent.ALT_MASK or NativeKeyEvent.SHIFT_MASK) != 0) && event.keyCode == NativeKeyEvent.VC_P) {
                     if (!isRecording) {
                         startRecording()
                     } else {
-                        stopRecordingAndProcess()
+                        stopRecordingAndTranscribe()
                     }
                     isRecording = !isRecording
                 }
@@ -53,10 +54,8 @@ fun setupGlobalShortcut() {
             override fun nativeKeyTyped(event: NativeKeyEvent) {}
         }
 
-        // Add the key listener
         GlobalScreen.addNativeKeyListener(keyListener)
 
-        // Add shutdown hook
         Runtime.getRuntime().addShutdownHook(Thread {
             try {
                 GlobalScreen.unregisterNativeHook()
@@ -78,30 +77,63 @@ fun setupGlobalShortcut() {
     }
 }
 
-// Function to start recording
 private fun startRecording() {
     println("\n🎤 Recording started... (Press Ctrl+Alt+Shift+P to stop)")
-    // TODO: Add your actual recording logic here
+    try {
+        audioRecorder.startRecording()
+    } catch (e: Exception) {
+        println("❌ Failed to start recording: ${e.message}")
+        e.printStackTrace()
+    }
 }
 
-// Function to stop recording, process the recording, and copy the result to the clipboard
-private fun stopRecordingAndProcess() {
-    println("\n⏹️ Recording stopped. Processing...")
-
+private fun stopRecordingAndTranscribe() {
+    println("\n⏹️ Stopping recording and starting transcription...")
     try {
-        // Simulate processing
-        Thread.sleep(1000)
+        val outputFile = File("recording_${System.currentTimeMillis()}.wav")
+        audioRecorder.stopRecording(outputFile)
 
-        val result = "Sample transcription result. Replace with actual implementation."
-
-        // Copy to clipboard
-        val selection = StringSelection(result)
-        val clipboard = Toolkit.getDefaultToolkit().systemClipboard
-        clipboard.setContents(selection, null)
-
-        println("✅ Processing complete! Result copied to clipboard.")
+        processAudioFile(outputFile)
     } catch (e: Exception) {
-        System.err.println("❌ Error processing recording: ${e.message}")
+        println("❌ Failed to stop recording or process transcription: ${e.message}")
         e.printStackTrace()
+    }
+}
+
+private fun processAudioFile(audioFile: File) {
+    println("🔍 Processing audio file: ${audioFile.name}")
+
+    if (!transcriptionService.isApiKeySet()) {
+        println("❌ API key not set. Please configure it in the settings.")
+        return
+    }
+
+    CoroutineScope(Dispatchers.IO).launch {
+        try {
+            val result = transcriptionService.transcribeAudio(audioFile)
+
+            result.onSuccess { transcript ->
+                val selection = StringSelection(transcript)
+                val clipboard = Toolkit.getDefaultToolkit().systemClipboard
+                clipboard.setContents(selection, null)
+                println("✅ Transcription complete! Result copied to clipboard.")
+            }.onFailure { error ->
+                System.err.println("❌ Transcription failed: ${error.message}")
+                error.printStackTrace()
+            }
+        } catch (e: Exception) {
+            System.err.println("❌ Error during transcription: ${e.message}")
+            e.printStackTrace()
+        } finally {
+            // Clean up the audio file
+            try {
+                if (audioFile.exists()) {
+                    audioFile.delete()
+                    println("🗑️ Deleted temporary audio file: ${audioFile.name}")
+                }
+            } catch (e: Exception) {
+                System.err.println("⚠️ Failed to delete temporary audio file: ${e.message}")
+            }
+        }
     }
 }
